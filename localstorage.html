@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>PHP CRUD with Local Storage</title>
+    <script>
+        // Function to add data to local storage
+        function createRecord() {
+            let name = document.getElementById('name').value;
+            let email = document.getElementById('email').value;
+
+            // Check if data already exists
+            if (localStorage.getItem('users') === null) {
+                localStorage.setItem('users', JSON.stringify([]));
+            }
+
+            let users = JSON.parse(localStorage.getItem('users'));
+            users.push({ name, email });
+            localStorage.setItem('users', JSON.stringify(users));
+
+            alert("User added to local storage!");
+            displayUsers();  // Display updated data
+        }
+
+        // Function to display data from local storage
+        function displayUsers() {
+            let users = JSON.parse(localStorage.getItem('users') || '[]');
+            let tableContent = "";
+
+            users.forEach((user, index) => {
+                tableContent += `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${user.name}</td>
+                        <td>${user.email}</td>
+                        <td><button onclick="editRecord(${index})">Edit</button></td>
+                        <td><button onclick="deleteRecord(${index})">Delete</button></td>
+                    </tr>
+                `;
+            });
+
+            document.getElementById('userTable').innerHTML = tableContent;
+        }
+
+        // Function to delete data from local storage
+        function deleteRecord(index) {
+            let users = JSON.parse(localStorage.getItem('users') || '[]');
+            users.splice(index, 1);
+            localStorage.setItem('users', JSON.stringify(users));
+            displayUsers();  // Refresh the table
+        }
+
+        // Function to edit a record
+        function editRecord(index) {
+            let users = JSON.parse(localStorage.getItem('users') || '[]');
+            let user = users[index];
+            
+            document.getElementById('name').value = user.name;
+            document.getElementById('email').value = user.email;
+            
+            deleteRecord(index);  // Delete current record so it can be replaced
+        }
+    </script>
+</head>
+<body onload="displayUsers()">
+    <h1>PHP CRUD with Local Storage</h1>
+
+    <form onsubmit="createRecord(); return false;">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" ><br><br>
+
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required><br><br>
+
+        <input type="submit" value="Add User">
+    </form>
+
+    <h2>Users List</h2>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>S.No</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Edit</th>
+                <th>Delete</th>
+            </tr>
+        </thead>
+        <tbody id="userTable"></tbody>
+    </table>
+</body>
+</html>
